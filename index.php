@@ -14,24 +14,30 @@ session_start();
 
 if(isset($_GET["session"]))
 {
-    destroySession();
+    ReloadGame();
     return 0;
 }
 
 if(isset($_SESSION["MaPartie"]))
 {
     $Partie = $_SESSION["MaPartie"];
-    if(isset($_POST["lettre"])){
-        $letter = $_POST["lettre"];
-        $Partie->party($letter);
-        //controle fin de partie
-        $_SESSION["MaPartie"] = $Partie;
+    //TODO controle fin de partie
+    if($Partie->__get('deadManScore')->__get("score") != 0)
+    {
+        if(isset($_POST["lettre"])){
+            $letter = $_POST["lettre"];
+            $Partie->play($letter);
+        }
+    $_SESSION["MaPartie"] = $Partie;
+    }
+    else{
+        ReloadGame();
     }
 }
-else $_SESSION["MaPartie"]= new GameClass("ALOE", 10);
+else $_SESSION["MaPartie"]= new GameClass("ALOE", 2);
 
 //Le jeu est fini, recommencer le jeu
-function destroySession(){
+function ReloadGame(){
     session_destroy();
 }
 

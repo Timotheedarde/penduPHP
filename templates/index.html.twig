@@ -9,6 +9,11 @@
 
 <body>
 
+    <div>
+        {{ hideWord }}
+    </div>
+
+
     <form action="" method="post">
         <p>Votre lettre : <input required minlength="1" maxlength="1" type="text" name="lettre" pattern="[A-Z]"/></p>
         <p><input type="submit" value="Proposer"></p>
@@ -17,6 +22,9 @@
     <div>
 
         il vous reste {{ score }} essai(s)!
+        {% if score == 0 %}
+            <p>Vous avez Perdu !</p>
+        {% endif %}
     </div>
 
 </body>

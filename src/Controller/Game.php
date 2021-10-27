@@ -12,14 +12,14 @@ class Game
     private $wordToGuessList;
     private $proposedLettersList;
     private $deadManScore;
-    private $invisibleWord;
+    private $invisibleWordList;
 
     public function __construct($wordToGuess, $deadManScore) {
         $this->wordToGuess = $wordToGuess;
         $this->wordToGuessList = $this->createWordToGuess();
         $this->proposedLettersList = $this->createProposedLettersList();
         $this->deadManScore = $this->createDeadMan($deadManScore);
-        $this->invisibleWord = $this->createInvisibleWord();
+        $this->invisibleWordList = $this->createInvisibleWord();
     }
 
     public function __get($property) {
@@ -34,7 +34,7 @@ class Game
             return $this->proposedLettersList;
         }
         if('deadManScore' === $property) {
-            return $this->badLetterList;
+            return $this->deadManScore;
         }
     }
 
@@ -57,25 +57,23 @@ class Game
         return new DMClass($score);
     }
 
-    public function browseWordList(){
-        for($i = 0; $i < count($this->__get("wordToGuessList")->letters); $i++)
-        {
-            echo $this->__get("wordToGuessList")->letters[$i];
-        }
-    }
-
-    public function party($letter){
+    public function play($letter){
         $wordToGuessList = $this->__get("wordToGuessList")->letters;
         if ($this->proposeLetter($letter)){
             foreach ($wordToGuessList as $key => $value){
                 if ($value===$letter){
-                    $this->invisibleWord[$key] = $value;
+                    $this->invisibleWordList[$key] = $value;
                 }
             }
+            if (!in_array($letter,$wordToGuessList)){
+                $this->deadManScore->decrementScore();
+            }
         }
-        if (!in_array($letter,$wordToGuessList)){
-            $this->deadManScore->decrementScore();
-        }
+
+        //var_dump("proposedLettersList",$this->proposedLettersList );
+        //var_dump("invisibleWordlist",$this->invisibleWordList);
+        //var_dump("string",$this->invisibleWord);
+        //echo "Score = " . $this->deadManScore->__get("score");
     }
 
     public function proposeLetter($letter){
@@ -88,13 +86,14 @@ class Game
     }
 
     public function createInvisibleWord(){
-        return array_fill(0,count($this->wordToGuessList->__get('letters'))-1,"*");
+        return array_fill(0,count($this->wordToGuessList->__get('letters')),"*");
     }
+
 
     public function getElements(){
         return array(
             "wordToGuess" => $this->wordToGuess,
-            "hideWord" => $this->invisibleWord,
+            "hideWord" => implode($this->invisibleWordList),
             "score"=>$this->deadManScore->__get("score"),
             "proposedLetters"=>$this->proposedLettersList->__get("letters")
         );
