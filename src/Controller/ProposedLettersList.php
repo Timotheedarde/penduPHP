@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Controller\DeadMan as DeadManClass;
-
 class ProposedLettersList
 {
     private $letters;

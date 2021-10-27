@@ -25,10 +25,6 @@ class DeadMan
         }
     }
 
-    public function showScore(){
-        echo "Il vous reste " . $this->__get('score') . "essai(s)";
-    }
-
     public function decrementScore(){
         $this->__set('score',$this->__get('score') - 1);
     }

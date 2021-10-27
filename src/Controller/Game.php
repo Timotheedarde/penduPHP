@@ -11,20 +11,15 @@ class Game
     private $wordToGuess;
     private $wordToGuessList;
     private $proposedLettersList;
-    private $goodLetterList;
-    private $badLetterList;
     private $deadManScore;
+    private $invisibleWord;
 
     public function __construct($wordToGuess, $deadManScore) {
         $this->wordToGuess = $wordToGuess;
         $this->wordToGuessList = $this->createWordToGuess();
         $this->proposedLettersList = $this->createProposedLettersList();
         $this->deadManScore = $this->createDeadMan($deadManScore);
-        $this->goodLetterList = [];
-        $this->badLetterList = [];
-        //var_dump($this->wordToGuessList);
-        //var_dump($this->proposedLettersList);
-        //var_dump($this->deadManScore);
+        $this->invisibleWord = $this->createInvisibleWord();
     }
 
     public function __get($property) {
@@ -38,16 +33,9 @@ class Game
         if('proposedLettersList' === $property) {
             return $this->proposedLettersList;
         }
-        if('goodLetterList' === $property) {
-            return $this->goodLetterList;
-        }
-        if('badLetterList' === $property) {
-            return $this->badLetterList;
-        }
         if('deadManScore' === $property) {
             return $this->badLetterList;
         }
-
     }
 
 
@@ -76,47 +64,39 @@ class Game
         }
     }
 
-    public function letterIsInList(){
+    public function party($letter){
         $wordToGuessList = $this->__get("wordToGuessList")->letters;
-        $proposedLettersList = $this->__get("proposedLettersList")->letters;
-        //var_dump($wordToGuessList);
-        //var_dump($proposedLettersList);
-        foreach($wordToGuessList as $value)
-        {
-            if(!in_array(end($proposedLettersList), $this->goodLetterList)
-                && !in_array(end($proposedLettersList), $this->badLetterList))
-            {
-                if($value === end($proposedLettersList))
-                {
-                    //"correspondance";
-                    array_push($this->goodLetterList, end($proposedLettersList));
-                }
-                elseif($value != end($proposedLettersList))
-                {
-                    //"pas de correspondance";
-                    array_push($this->badLetterList, end($proposedLettersList));
-                    $this->deadManScore->decrementScore();
+        if ($this->proposeLetter($letter)){
+            foreach ($wordToGuessList as $key => $value){
+                if ($value===$letter){
+                    $this->invisibleWord[$key] = $value;
                 }
             }
+        }
+        if (!in_array($letter,$wordToGuessList)){
+            $this->deadManScore->decrementScore();
         }
     }
 
     public function proposeLetter($letter){
-        $this->proposedLettersList->addLetterToList($letter);
+        if(!in_array($letter,$this->proposedLettersList->__get('letters')))
+        {
+            $this->proposedLettersList->addLetterToList($letter);
+            return true;
+        }
+        return false;
     }
 
-    public function showGoodList(){
-        echo "goodListe : " ; var_dump($this->__get("goodLetterList"));
+    public function createInvisibleWord(){
+        return array_fill(0,count($this->wordToGuessList->__get('letters'))-1,"*");
     }
 
-    public function showBadList(){
-        echo "badListe : " ; var_dump($this->__get("badLetterList"));
+    public function getElements(){
+        return array(
+            "wordToGuess" => $this->wordToGuess,
+            "hideWord" => $this->invisibleWord,
+            "score"=>$this->deadManScore->__get("score"),
+            "proposedLetters"=>$this->proposedLettersList->__get("letters")
+        );
     }
-
-    public function showDeadManscore(){
-        $this->deadManScore->showScore();
-    }
-
-    public function
-
 }
